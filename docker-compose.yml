@@ -1,0 +1,22 @@
+services:
+  kiln-api:
+    build: .
+    image: kiln-scheduler:latest
+    container_name: kiln-scheduler
+    restart: unless-stopped
+    ports:
+      - "${PORT:-8000}:8000"
+    environment:
+      # SQLite 数据库文件路径（位于持久化卷内）
+      DATABASE_PATH: /data/kiln.db
+    volumes:
+      - kiln-data:/data
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://127.0.0.1:8000/health', timeout=3)"]
+      interval: 15s
+      timeout: 5s
+      retries: 5
+      start_period: 20s
+
+volumes:
+  kiln-data:
